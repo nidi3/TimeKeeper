@@ -42,7 +42,7 @@ class TimeKeeperApp {
 
     init {
         if (!SystemTray.isSupported()) {
-            JOptionPane.showMessageDialog(null, "System tray is not supported", "Error", JOptionPane.ERROR_MESSAGE)
+            showError("System tray is not supported")
             exitProcess(1)
         }
 
@@ -82,7 +82,7 @@ class TimeKeeperApp {
         runCatching {
             SystemTray.getSystemTray().add(trayIcon)
         }.onFailure {
-            JOptionPane.showMessageDialog(null, "Failed to add tray icon", "Error", JOptionPane.ERROR_MESSAGE)
+            showError("Failed to add tray icon")
             exitProcess(1)
         }
 

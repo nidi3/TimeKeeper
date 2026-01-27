@@ -25,6 +25,8 @@ Prefer Kotlin standard library functions over Java equivalents:
 - `lazy {}` for lazy initialization
 - `takeIf {}` / `takeUnless {}` for conditional returns
 - Trailing lambda syntax for SAM interfaces
+- Sealed classes for state management with `when (val s = state)` for smart casting
+- Scope functions (`apply`, `also`, `let`, `run`, `with`) for concise initialization
 
 ## Architecture
 
@@ -34,11 +36,11 @@ TimeKeeper is a Kotlin/Swing desktop application that runs as a system tray time
 
 ### Components
 
-- **Main.kt** - Entry point and `TimeKeeperApp` class. Manages system tray icon, timer loop, and idle detection (auto-stops after 30s of inactivity). Creates play/pause icons programmatically.
+- **Main.kt** - Entry point, `TimerState` sealed class, and `TimeKeeperApp` class. Manages system tray icon, timer loop, and idle detection (auto-stops after 30s of inactivity).
 
 - **TimeTracker.kt** - Session persistence layer. Contains `TimeSession` data class and `TimeTracker` class that stores sessions to `~/.timekeeper_data.txt` in pipe-delimited format (`startTime|endTime|autoStopped`).
 
-- **OverviewWindow.kt** - Statistics display window with tabbed views for daily and weekly session summaries.
+- **OverviewWindow.kt** - Singleton statistics window with tabbed views for daily and weekly session summaries. Use `OverviewWindow.show(timeTracker)` to display.
 
 - **Extensions.kt** - Kotlin extension functions (e.g., `Duration.format()`).
 

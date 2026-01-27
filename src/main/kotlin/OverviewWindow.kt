@@ -12,13 +12,15 @@ class OverviewWindow private constructor(private val timeTracker: TimeTracker) {
     }
 
     companion object {
-        private var instance: OverviewWindow? = null
+        private lateinit var instance: OverviewWindow
 
         fun show(timeTracker: TimeTracker) {
-            val window = instance ?: OverviewWindow(timeTracker).also { instance = it }
-            window.refresh()
-            window.frame.isVisible = true
-            window.frame.toFront()
+            if (!::instance.isInitialized) instance = OverviewWindow(timeTracker)
+            instance.apply {
+                refresh()
+                frame.isVisible = true
+                frame.toFront()
+            }
         }
     }
 
