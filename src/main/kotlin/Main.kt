@@ -3,8 +3,9 @@
 import java.awt.*
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
-import javax.swing.*
+import java.awt.image.BufferedImage
 import java.time.LocalDateTime
+import javax.swing.*
 import kotlin.system.exitProcess
 
 fun main() {
@@ -26,7 +27,7 @@ class TimeKeeperApp {
 
     init {
         if (!SystemTray.isSupported()) {
-            javax.swing.JOptionPane.showMessageDialog(null, "System tray is not supported", "Error", javax.swing.JOptionPane.ERROR_MESSAGE)
+            JOptionPane.showMessageDialog(null, "System tray is not supported", "Error", JOptionPane.ERROR_MESSAGE)
             exitProcess(1)
         }
 
@@ -68,7 +69,7 @@ class TimeKeeperApp {
         runCatching {
             SystemTray.getSystemTray().add(trayIcon)
         }.onFailure {
-            javax.swing.JOptionPane.showMessageDialog(null, "Failed to add tray icon", "Error", javax.swing.JOptionPane.ERROR_MESSAGE)
+            JOptionPane.showMessageDialog(null, "Failed to add tray icon", "Error", JOptionPane.ERROR_MESSAGE)
             exitProcess(1)
         }
 
@@ -117,7 +118,7 @@ class TimeKeeperApp {
     }
 
     private fun createIcon(size: Int, draw: (Graphics2D, Int) -> Unit) =
-        java.awt.image.BufferedImage(size, size, java.awt.image.BufferedImage.TYPE_INT_ARGB).also { image ->
+        BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB).also { image ->
             image.createGraphics().apply {
                 setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
                 color = Color.WHITE

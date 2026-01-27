@@ -15,7 +15,6 @@ No tests or linting are currently configured.
 
 Prefer Kotlin standard library functions over Java equivalents:
 - Use `exitProcess()` instead of `System.exit()`
-- Import Kotlin functions explicitly (e.g., `import kotlin.system.exitProcess`)
 
 ## Architecture
 
