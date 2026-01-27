@@ -26,7 +26,7 @@ Prefer Kotlin standard library functions over Java equivalents:
 - `takeIf {}` / `takeUnless {}` for conditional returns
 - Trailing lambda syntax for SAM interfaces
 - Sealed classes for state management with `when (val s = state)` for smart casting
-- Scope functions (`apply`, `also`, `let`, `run`, `with`) for concise initialization
+- Scope functions: when accessing the same object multiple times, always use `apply`/`also`/`let`/`run`/`with`
 - Private file-level helpers at end of file
 - Use imports, not fully qualified class names
 

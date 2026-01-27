@@ -1,8 +1,7 @@
 package com.timekeeper
 
 import java.io.*
-import java.time.DayOfWeek
-import java.time.LocalDateTime
+import java.time.*
 import kotlin.time.Duration
 import kotlin.time.toKotlinDuration
 import java.time.Duration as JavaDuration
@@ -34,12 +33,12 @@ class TimeTracker {
     }
 
     fun getTodaySessions() =
-        LocalDateTime.now().toLocalDate().let { today ->
+        LocalDate.now().let { today ->
             sessions.filter { it.startTime.toLocalDate() == today }
         }
 
     fun getWeekSessions(): List<TimeSession> {
-        val monday = LocalDateTime.now().toLocalDate().with(DayOfWeek.MONDAY).atStartOfDay()
+        val monday = LocalDate.now().with(DayOfWeek.MONDAY).atStartOfDay()
         return sessions.filter { it.startTime >= monday }
     }
 

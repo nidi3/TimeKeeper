@@ -34,6 +34,7 @@ class TimeKeeperApp {
     }
 
     private val timeTracker = TimeTracker()
+    private val overviewWindow = OverviewWindow(timeTracker)
     private val stoppedIcon = createStoppedIcon()
     private val runningIcon = createRunningIcon()
     private val trayIcon: TrayIcon
@@ -146,6 +147,7 @@ class TimeKeeperApp {
         trayIcon.image = runningIcon
         timer.start()
         updateDisplay()
+        overviewWindow.update(state)
     }
 
     private fun stopTimer(autoStopped: Boolean = false, endTime: LocalDateTime? = null) {
@@ -162,6 +164,7 @@ class TimeKeeperApp {
                 trayIcon.image = stoppedIcon
                 timer.stop()
                 updateDisplay()
+                overviewWindow.update(state)
             }
 
             is TimerState.Stopped -> {}
@@ -172,5 +175,5 @@ class TimeKeeperApp {
         trayIcon.toolTip = state.elapsed.format()
     }
 
-    private fun showOverview() = OverviewWindow.show(timeTracker, state)
+    private fun showOverview() = overviewWindow.show(state)
 }
