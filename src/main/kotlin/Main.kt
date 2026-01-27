@@ -16,6 +16,12 @@ fun main() {
 }
 
 class TimeKeeperApp {
+    companion object {
+        private const val IDLE_TIMEOUT_MS = 30000L
+        private const val TIMER_INTERVAL_MS = 1000
+        private const val ICON_SIZE = 22
+    }
+
     private val trayIcon: TrayIcon
     private val timer: Timer
     private val timeTracker: TimeTracker
@@ -73,14 +79,14 @@ class TimeKeeperApp {
             exitProcess(1)
         }
 
-        timer = Timer(1000, object : ActionListener {
+        timer = Timer(TIMER_INTERVAL_MS, object : ActionListener {
             private var lastCheckTime = System.currentTimeMillis()
 
             override fun actionPerformed(e: ActionEvent) {
                 val currentTime = System.currentTimeMillis()
                 val timeDiff = currentTime - lastCheckTime
 
-                if (timeDiff > 30000 && isRunning) {
+                if (timeDiff > IDLE_TIMEOUT_MS && isRunning) {
                     stopTimer(autoStopped = true, endTime = LocalDateTime.now().minusSeconds(timeDiff / 1000))
                     val menuItem = (popup.getItem(0) as MenuItem)
                     menuItem.label = "Start"
@@ -96,7 +102,7 @@ class TimeKeeperApp {
         })
     }
 
-    private fun createStoppedIcon() = createIcon(22) { g, size ->
+    private fun createStoppedIcon() = createIcon(ICON_SIZE) { g, size ->
         val triangleSize = 10
         val startX = (size - triangleSize) / 2 + 2
         val startY = (size - triangleSize) / 2
@@ -107,7 +113,7 @@ class TimeKeeperApp {
         )
     }
 
-    private fun createRunningIcon() = createIcon(22) { g, size ->
+    private fun createRunningIcon() = createIcon(ICON_SIZE) { g, size ->
         val barWidth = 3
         val barHeight = 12
         val spacing = 3
