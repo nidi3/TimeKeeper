@@ -5,8 +5,10 @@ import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.*
 import java.time.LocalDateTime
+import kotlin.system.exitProcess
 
 fun main() {
+    System.setProperty("apple.awt.UIElement", "true")
     SwingUtilities.invokeLater {
         TimeKeeperApp()
     }
@@ -25,7 +27,7 @@ class TimeKeeperApp {
     init {
         if (!SystemTray.isSupported()) {
             javax.swing.JOptionPane.showMessageDialog(null, "System tray is not supported", "Error", javax.swing.JOptionPane.ERROR_MESSAGE)
-            System.exit(1)
+            exitProcess(1)
         }
 
         timeTracker = TimeTracker()
@@ -54,7 +56,7 @@ class TimeKeeperApp {
             add(MenuItem("Exit").apply {
                 addActionListener {
                     SystemTray.getSystemTray().remove(trayIcon)
-                    System.exit(0)
+                    exitProcess(0)
                 }
             })
         }
@@ -67,7 +69,7 @@ class TimeKeeperApp {
             SystemTray.getSystemTray().add(trayIcon)
         }.onFailure {
             javax.swing.JOptionPane.showMessageDialog(null, "Failed to add tray icon", "Error", javax.swing.JOptionPane.ERROR_MESSAGE)
-            System.exit(1)
+            exitProcess(1)
         }
 
         timer = Timer(1000, object : ActionListener {

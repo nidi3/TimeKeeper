@@ -11,6 +11,12 @@ This is an IntelliJ IDEA project without Gradle/Maven. Build and run through the
 
 No tests or linting are currently configured.
 
+## Code Style
+
+Prefer Kotlin standard library functions over Java equivalents:
+- Use `exitProcess()` instead of `System.exit()`
+- Import Kotlin functions explicitly (e.g., `import kotlin.system.exitProcess`)
+
 ## Architecture
 
 TimeKeeper is a Kotlin/Swing desktop application that runs as a system tray timer for tracking work sessions.
