@@ -1,9 +1,10 @@
- package com.timekeeper
+package com.timekeeper
 
 import java.awt.*
 import java.awt.image.BufferedImage
 import java.time.LocalDateTime
-import javax.swing.*
+import javax.swing.SwingUtilities
+import javax.swing.Timer
 import kotlin.system.exitProcess
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -53,6 +54,7 @@ class TimeKeeperApp {
                         stopTimer(autoStopped = false)
                         label = "Start"
                     }
+
                     is TimerState.Stopped -> {
                         startTimer()
                         label = "Stop"
@@ -100,6 +102,7 @@ class TimeKeeperApp {
                         updateDisplay()
                     }
                 }
+
                 is TimerState.Stopped -> {}
             }
 
@@ -148,12 +151,19 @@ class TimeKeeperApp {
     private fun stopTimer(autoStopped: Boolean = false, endTime: LocalDateTime? = null) {
         when (val s = state) {
             is TimerState.Running -> {
-                timeTracker.addSession(TimeSession(s.startTime, endTime ?: LocalDateTime.now(), autoStopped))
+                timeTracker.addSession(
+                    TimeSession(
+                        s.startTime,
+                        endTime ?: LocalDateTime.now(),
+                        autoStopped = autoStopped
+                    )
+                )
                 state = TimerState.Stopped
                 trayIcon.image = stoppedIcon
                 timer.stop()
                 updateDisplay()
             }
+
             is TimerState.Stopped -> {}
         }
     }

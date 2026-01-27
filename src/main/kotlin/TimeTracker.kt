@@ -9,6 +9,7 @@ import java.time.Duration as JavaDuration
 data class TimeSession(
     val startTime: LocalDateTime,
     val endTime: LocalDateTime,
+    val running: Boolean = false,
     val autoStopped: Boolean = false
 ) {
     val duration: Duration
@@ -66,7 +67,7 @@ class TimeTracker {
                             val start = LocalDateTime.parse(parts[0])
                             val end = LocalDateTime.parse(parts[1])
                             val autoStopped = if (parts.size >= 3) parts[2].toBoolean() else false
-                            sessions.add(TimeSession(start, end, autoStopped))
+                            sessions.add(TimeSession(start, end, autoStopped = autoStopped))
                         }
                     }
                 }

@@ -1,6 +1,7 @@
 package com.timekeeper
 
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Font
 import java.time.LocalDateTime
 import javax.swing.*
 
@@ -39,8 +40,8 @@ class OverviewWindow private constructor(private val timeTracker: TimeTracker) {
         title = "TODAY'S SESSIONS",
         sessions = timeTracker.getTodaySessions(),
         emptyMessage = "No sessions recorded today."
-    ) { sessions, runningSession ->
-        sessions.forEach { append(it.format(it == runningSession)) }
+    ) { sessions ->
+        sessions.forEach { append(it.format()) }
         append("\nTotal: ${timeTracker.getTotalDuration(sessions).format()}\n")
     }
 
@@ -48,10 +49,10 @@ class OverviewWindow private constructor(private val timeTracker: TimeTracker) {
         title = "LAST 7 DAYS",
         sessions = timeTracker.getWeeklySessions(),
         emptyMessage = "No sessions recorded in the last 7 days."
-    ) { sessions, runningSession ->
+    ) { sessions ->
         sessions.groupBy { it.startTime.toLocalDate() }.toSortedMap().forEach { (date, daySessions) ->
             append(date.formatDate()).append("\n")
-            daySessions.forEach { append("  ").append(it.format(it == runningSession)) }
+            daySessions.forEach { append("  ").append(it.format()) }
             append("  Day total: ${timeTracker.getTotalDuration(daySessions).format()}\n\n")
         }
         append("Week total: ${timeTracker.getTotalDuration(sessions).format()}\n")
@@ -61,10 +62,12 @@ class OverviewWindow private constructor(private val timeTracker: TimeTracker) {
         title: String,
         sessions: List<TimeSession>,
         emptyMessage: String,
-        renderSessions: StringBuilder.(List<TimeSession>, TimeSession?) -> Unit
+        renderSessions: StringBuilder.(List<TimeSession>) -> Unit
     ): JPanel {
-        val runningSession = if (currentState is TimerState.Running) TimeSession(currentState.startTime, LocalDateTime.now()) else null
-        val allSessions = runningSession?.let { sessions + it } ?: sessions
+        val allSessions = when (val s = currentState) {
+            is TimerState.Running -> sessions + TimeSession(s.startTime, LocalDateTime.now(), running = true)
+            is TimerState.Stopped -> sessions
+        }
         return JPanel(BorderLayout()).apply {
             add(JScrollPane(JTextArea().apply {
                 isEditable = false
@@ -73,17 +76,17 @@ class OverviewWindow private constructor(private val timeTracker: TimeTracker) {
                     append("$title\n")
                     append("=".repeat(50)).append("\n\n")
                     if (allSessions.isEmpty()) append("$emptyMessage\n")
-                    else renderSessions(allSessions, runningSession)
+                    else renderSessions(allSessions)
                 }
             }), BorderLayout.CENTER)
         }
     }
 }
 
-private fun TimeSession.format(isRunning: Boolean = false): String {
-    val endStr = if (isRunning) "...     " else endTime.formatTime()
+private fun TimeSession.format(): String {
+    val endStr = if (running) "...     " else endTime.formatTime()
     val suffix = when {
-        isRunning -> " [running]"
+        running -> " [running]"
         autoStopped -> " [auto-stopped]"
         else -> ""
     }
