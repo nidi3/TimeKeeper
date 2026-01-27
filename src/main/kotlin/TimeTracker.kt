@@ -7,13 +7,13 @@ import kotlin.time.toKotlinDuration
 import java.time.Duration as JavaDuration
 
 data class TimeSession(
-    val startTime: LocalDateTime,
-    val endTime: LocalDateTime,
+    val start: LocalDateTime,
+    val end: LocalDateTime,
     val inProgress: Boolean = false,
     val autoStopped: Boolean = false
 ) {
     val duration: Duration
-        get() = JavaDuration.between(startTime, endTime).toKotlinDuration()
+        get() = JavaDuration.between(start, end).toKotlinDuration()
 }
 
 class TimeTracker {
@@ -34,12 +34,12 @@ class TimeTracker {
 
     fun getTodaySessions() =
         LocalDate.now().let { today ->
-            sessions.filter { it.startTime.toLocalDate() == today }
+            sessions.filter { it.start.toLocalDate() == today }
         }
 
     fun getWeekSessions(): List<TimeSession> {
         val monday = LocalDate.now().with(DayOfWeek.MONDAY).atStartOfDay()
-        return sessions.filter { it.startTime >= monday }
+        return sessions.filter { it.start >= monday }
     }
 
     fun getTotalDuration(sessions: List<TimeSession>): Duration =
@@ -49,7 +49,7 @@ class TimeTracker {
         runCatching {
             PrintWriter(FileWriter(DATA_FILE)).use { writer ->
                 sessions.forEach { session ->
-                    writer.println("${session.startTime}|${session.endTime}|${session.autoStopped}")
+                    writer.println("${session.start}|${session.end}|${session.autoStopped}")
                 }
             }
         }.onFailure { showError("Failed to save sessions: ${it.message}") }

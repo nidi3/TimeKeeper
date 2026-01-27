@@ -17,7 +17,7 @@ class SessionFormatter(private val timeTracker: TimeTracker) {
         sessions = timeTracker.getWeekSessions()
     ) { sessions ->
         val today = LocalDate.now()
-        val sessionsByDate = sessions.groupBy { it.startTime.toLocalDate() }
+        val sessionsByDate = sessions.groupBy { it.start.toLocalDate() }
         generateSequence(today.with(DayOfWeek.MONDAY)) { it.plusDays(1) }
             .takeWhile { it <= today }
             .forEach { appendDay(it, sessionsByDate[it] ?: emptyList()).also { append("\n") } }
@@ -47,11 +47,11 @@ class SessionFormatter(private val timeTracker: TimeTracker) {
 }
 
 private fun TimeSession.format(): String {
-    val endStr = if (inProgress) "...  " else endTime.formatTime()
+    val endStr = if (inProgress) "...  " else end.formatTime()
     val suffix = when {
         inProgress -> " [in progress]"
         autoStopped -> " [auto-stopped]"
         else -> ""
     }
-    return "${startTime.formatTime()} - $endStr (${duration.format()})$suffix\n"
+    return "${start.formatTime()} - $endStr (${duration.format()})$suffix\n"
 }
