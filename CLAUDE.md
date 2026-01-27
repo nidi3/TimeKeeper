@@ -21,6 +21,10 @@ Prefer Kotlin standard library functions over Java equivalents:
 - `use {}` for resources
 - `buildString {}` instead of `StringBuilder`
 - `runCatching {}` instead of try-catch
+- String templates `"$var"` instead of `String.format()`
+- `lazy {}` for lazy initialization
+- `takeIf {}` / `takeUnless {}` for conditional returns
+- Trailing lambda syntax for SAM interfaces
 
 ## Architecture
 

@@ -1,12 +1,11 @@
  package com.timekeeper
 
 import java.awt.*
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
 import java.awt.image.BufferedImage
 import java.time.LocalDateTime
 import javax.swing.*
 import kotlin.system.exitProcess
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 fun main() {
@@ -27,8 +26,9 @@ class TimeKeeperApp {
     private val timer: Timer
     private val timeTracker: TimeTracker
     private var startTime: LocalDateTime? = null
-    private var elapsedSeconds: Long = 0
+    private var elapsed: Duration = Duration.ZERO
     private var isRunning = false
+    private var lastCheckTime = System.currentTimeMillis()
     private val stoppedIcon: Image
     private val runningIcon: Image
 
@@ -80,27 +80,23 @@ class TimeKeeperApp {
             exitProcess(1)
         }
 
-        timer = Timer(TIMER_INTERVAL.inWholeMilliseconds.toInt(), object : ActionListener {
-            private var lastCheckTime = System.currentTimeMillis()
+        timer = Timer(TIMER_INTERVAL.inWholeMilliseconds.toInt()) {
+            val currentTime = System.currentTimeMillis()
+            val timeDiff = currentTime - lastCheckTime
 
-            override fun actionPerformed(e: ActionEvent) {
-                val currentTime = System.currentTimeMillis()
-                val timeDiff = currentTime - lastCheckTime
-
-                if (timeDiff > IDLE_TIMEOUT.inWholeMilliseconds && isRunning) {
-                    stopTimer(autoStopped = true, endTime = LocalDateTime.now().minusSeconds(timeDiff / 1000))
-                    val menuItem = (popup.getItem(0) as MenuItem)
-                    menuItem.label = "Start"
-                }
-
-                if (isRunning) {
-                    elapsedSeconds++
-                    updateDisplay()
-                }
-
-                lastCheckTime = currentTime
+            if (timeDiff > IDLE_TIMEOUT.inWholeMilliseconds && isRunning) {
+                stopTimer(autoStopped = true, endTime = LocalDateTime.now().minusSeconds(timeDiff / 1000))
+                val menuItem = (popup.getItem(0) as MenuItem)
+                menuItem.label = "Start"
             }
-        })
+
+            if (isRunning) {
+                elapsed += 1.seconds
+                updateDisplay()
+            }
+
+            lastCheckTime = currentTime
+        }
     }
 
     private fun createStoppedIcon() = createIcon(ICON_SIZE) { g, size ->
@@ -136,7 +132,7 @@ class TimeKeeperApp {
 
     private fun startTimer() {
         startTime = LocalDateTime.now()
-        elapsedSeconds = 0
+        elapsed = Duration.ZERO
         isRunning = true
         trayIcon.image = runningIcon
         timer.start()
@@ -149,18 +145,16 @@ class TimeKeeperApp {
             isRunning = false
             trayIcon.image = stoppedIcon
             timer.stop()
-            elapsedSeconds = 0
+            elapsed = Duration.ZERO
             updateDisplay()
         }
     }
 
     private fun updateDisplay() {
-        trayIcon.toolTip = String.format(
-            "%02d:%02d:%02d",
-            elapsedSeconds / 3600,
-            (elapsedSeconds % 3600) / 60,
-            elapsedSeconds % 60
-        )
+        fun Number.pad() = toString().padStart(2, '0')
+        elapsed.toComponents { hours, minutes, seconds, _ ->
+            trayIcon.toolTip = "${hours.pad()}:${minutes.pad()}:${seconds.pad()}"
+        }
     }
 
     private fun showOverview() = OverviewWindow(timeTracker)
