@@ -3,7 +3,6 @@ package com.timekeeper
 import javax.swing.*
 import java.awt.*
 import java.time.format.DateTimeFormatter
-import java.time.Duration
 
 class OverviewWindow(private val timeTracker: TimeTracker) {
     private val frame: JFrame
@@ -37,12 +36,12 @@ class OverviewWindow(private val timeTracker: TimeTracker) {
                     DateTimeFormatter.ofPattern("HH:mm:ss").let { formatter ->
                         sessions.forEach { session ->
                             append("${session.startTime.format(formatter)} - ${session.endTime.format(formatter)}  ")
-                            append("(${formatDuration(session.duration)})")
+                            append("(${session.duration.format()})")
                             if (session.autoStopped) append(" [auto-stopped]")
                             append("\n")
                         }
                     }
-                    append("\nTotal: ${formatDuration(timeTracker.getTotalDuration(sessions))}\n")
+                    append("\nTotal: ${timeTracker.getTotalDuration(sessions).format()}\n")
                 }
             }
         }), BorderLayout.CENTER)
@@ -65,22 +64,15 @@ class OverviewWindow(private val timeTracker: TimeTracker) {
                         append(date.format(dateFormatter)).append("\n")
                         daySessions.forEach { session ->
                             append("  ${session.startTime.format(timeFormatter)} - ${session.endTime.format(timeFormatter)}  ")
-                            append("(${formatDuration(session.duration)})")
+                            append("(${session.duration.format()})")
                             if (session.autoStopped) append(" [auto-stopped]")
                             append("\n")
                         }
-                        append("  Day total: ${formatDuration(timeTracker.getTotalDuration(daySessions))}\n\n")
+                        append("  Day total: ${timeTracker.getTotalDuration(daySessions).format()}\n\n")
                     }
-                    append("Week total: ${formatDuration(timeTracker.getTotalDuration(sessions))}\n")
+                    append("Week total: ${timeTracker.getTotalDuration(sessions).format()}\n")
                 }
             }
         }), BorderLayout.CENTER)
     }
-
-    private fun formatDuration(duration: Duration) = String.format(
-        "%02d:%02d:%02d",
-        duration.toHours(),
-        duration.toMinutes() % 60,
-        duration.seconds % 60
-    )
 }

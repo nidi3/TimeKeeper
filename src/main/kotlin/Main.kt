@@ -69,7 +69,7 @@ class TimeKeeperApp {
             })
         }
 
-        trayIcon = TrayIcon(stoppedIcon, "00:00:00", popup).apply {
+        trayIcon = TrayIcon(stoppedIcon, Duration.ZERO.format(), popup).apply {
             isImageAutoSize = true
         }
 
@@ -151,10 +151,7 @@ class TimeKeeperApp {
     }
 
     private fun updateDisplay() {
-        fun Number.pad() = toString().padStart(2, '0')
-        elapsed.toComponents { hours, minutes, seconds, _ ->
-            trayIcon.toolTip = "${hours.pad()}:${minutes.pad()}:${seconds.pad()}"
-        }
+        trayIcon.toolTip = elapsed.format()
     }
 
     private fun showOverview() = OverviewWindow(timeTracker)

@@ -1,8 +1,10 @@
 package com.timekeeper
 
-import java.time.LocalDateTime
-import java.time.Duration
 import java.io.*
+import java.time.LocalDateTime
+import kotlin.time.Duration
+import kotlin.time.toKotlinDuration
+import java.time.Duration as JavaDuration
 
 data class TimeSession(
     val startTime: LocalDateTime,
@@ -10,7 +12,7 @@ data class TimeSession(
     val autoStopped: Boolean = false
 ) {
     val duration: Duration
-        get() = Duration.between(startTime, endTime)
+        get() = JavaDuration.between(startTime, endTime).toKotlinDuration()
 }
 
 class TimeTracker {
@@ -36,8 +38,8 @@ class TimeTracker {
             sessions.filter { it.startTime.isAfter(now.minusDays(7)) }
         }
 
-    fun getTotalDuration(sessions: List<TimeSession>) =
-        sessions.fold(Duration.ZERO) { acc, session -> acc.plus(session.duration) }
+    fun getTotalDuration(sessions: List<TimeSession>): Duration =
+        sessions.fold(Duration.ZERO) { acc, session -> acc + session.duration }
 
     private fun saveSessions() {
         runCatching {
