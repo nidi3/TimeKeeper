@@ -28,6 +28,7 @@ Prefer Kotlin standard library functions over Java equivalents:
 - Sealed classes for state management with `when (val s = state)` for smart casting
 - Scope functions (`apply`, `also`, `let`, `run`, `with`) for concise initialization
 - Private file-level helpers at end of file
+- Use imports, not fully qualified class names
 
 ## Architecture
 

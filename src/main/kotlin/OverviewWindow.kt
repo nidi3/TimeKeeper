@@ -1,8 +1,7 @@
 package com.timekeeper
 
-import java.awt.BorderLayout
-import java.awt.Font
-import java.time.LocalDateTime
+import java.awt.*
+import java.time.*
 import javax.swing.*
 
 class OverviewWindow private constructor(private val timeTracker: TimeTracker) {
@@ -22,7 +21,9 @@ class OverviewWindow private constructor(private val timeTracker: TimeTracker) {
                 currentState = state
                 refresh()
                 frame.isVisible = true
-                frame.toFront()
+                frame.extendedState = JFrame.NORMAL
+                frame.isAlwaysOnTop = true
+                frame.requestFocus()
             }
         }
     }
@@ -37,31 +38,33 @@ class OverviewWindow private constructor(private val timeTracker: TimeTracker) {
     }
 
     private fun createDailyPanel() = createPanel(
-        title = "TODAY'S SESSIONS",
-        sessions = timeTracker.getTodaySessions(),
-        emptyMessage = "No sessions recorded today."
+        title = "TODAY",
+        sessions = timeTracker.getTodaySessions()
     ) { sessions ->
-        sessions.forEach { append(it.format()) }
-        append("\nTotal: ${timeTracker.getTotalDuration(sessions).format()}\n")
+        appendDay(LocalDate.now(), sessions)
     }
 
     private fun createWeeklyPanel() = createPanel(
-        title = "LAST 7 DAYS",
-        sessions = timeTracker.getWeeklySessions(),
-        emptyMessage = "No sessions recorded in the last 7 days."
+        title = "THIS WEEK",
+        sessions = timeTracker.getWeekSessions()
     ) { sessions ->
-        sessions.groupBy { it.startTime.toLocalDate() }.toSortedMap().forEach { (date, daySessions) ->
-            append(date.formatDate()).append("\n")
-            daySessions.forEach { append("  ").append(it.format()) }
-            append("  Day total: ${timeTracker.getTotalDuration(daySessions).format()}\n\n")
-        }
+        val today = LocalDate.now()
+        val sessionsByDate = sessions.groupBy { it.startTime.toLocalDate() }
+        generateSequence(today.with(DayOfWeek.MONDAY)) { it.plusDays(1) }
+            .takeWhile { it <= today }
+            .forEach { appendDay(it, sessionsByDate[it] ?: emptyList()).also { append("\n") } }
         append("Week total: ${timeTracker.getTotalDuration(sessions).format()}\n")
+    }
+
+    private fun StringBuilder.appendDay(date: LocalDate, sessions: List<TimeSession>) {
+        append(date.formatDate()).append("\n")
+        sessions.forEach { append("  ").append(it.format()) }
+        append("  Day total: ${timeTracker.getTotalDuration(sessions).format()}\n")
     }
 
     private fun createPanel(
         title: String,
         sessions: List<TimeSession>,
-        emptyMessage: String,
         renderSessions: StringBuilder.(List<TimeSession>) -> Unit
     ): JPanel {
         val allSessions = when (val s = currentState) {
@@ -75,8 +78,7 @@ class OverviewWindow private constructor(private val timeTracker: TimeTracker) {
                 text = buildString {
                     append("$title\n")
                     append("=".repeat(50)).append("\n\n")
-                    if (allSessions.isEmpty()) append("$emptyMessage\n")
-                    else renderSessions(allSessions)
+                    renderSessions(allSessions)
                 }
             }), BorderLayout.CENTER)
         }
@@ -84,7 +86,7 @@ class OverviewWindow private constructor(private val timeTracker: TimeTracker) {
 }
 
 private fun TimeSession.format(): String {
-    val endStr = if (running) "...     " else endTime.formatTime()
+    val endStr = if (running) "...  " else endTime.formatTime()
     val suffix = when {
         running -> " [running]"
         autoStopped -> " [auto-stopped]"
