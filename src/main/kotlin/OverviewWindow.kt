@@ -1,6 +1,7 @@
 package com.timekeeper
 
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Font
 import javax.swing.*
 
 class OverviewWindow(timeTracker: TimeTracker) {
@@ -32,9 +33,9 @@ class OverviewWindow(timeTracker: TimeTracker) {
         dailyText.text = formatter.buildDailyText(state)
         weeklyText.text = formatter.buildWeeklyText(state)
     }
-}
 
-private fun createTextArea() = JTextArea().apply {
-    isEditable = false
-    font = Font(Font.MONOSPACED, Font.PLAIN, 12)
+    private fun createTextArea() = JTextArea().apply {
+        isEditable = false
+        font = Font(Font.MONOSPACED, Font.PLAIN, 12)
+    }
 }

@@ -42,9 +42,11 @@ TimeKeeper is a Kotlin/Swing desktop application that runs as a system tray time
 
 - **TimeTracker.kt** - Session persistence layer. Contains `TimeSession` data class and `TimeTracker` class that stores sessions to `~/.timekeeper_data.txt` in pipe-delimited format (`startTime|endTime|autoStopped`).
 
-- **OverviewWindow.kt** - Singleton statistics window with tabbed views for daily and weekly session summaries. Use `OverviewWindow.show(timeTracker)` to display.
+- **OverviewWindow.kt** - Statistics window with tabbed views for daily and weekly session summaries. Handles UI only, delegates text generation to `SessionFormatter`.
 
-- **Extensions.kt** - Kotlin extension functions (e.g., `Duration.format()`).
+- **SessionFormatter.kt** - Generates formatted text for session displays. Separates text handling from UI.
+
+- **Extensions.kt** - Kotlin extension functions for formatting (`Duration.format()`, `LocalDateTime.formatTime()`, `LocalDate.formatDate()`).
 
 ### Data Flow
 

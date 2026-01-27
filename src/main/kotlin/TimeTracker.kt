@@ -9,7 +9,7 @@ import java.time.Duration as JavaDuration
 data class TimeSession(
     val startTime: LocalDateTime,
     val endTime: LocalDateTime,
-    val running: Boolean = false,
+    val inProgress: Boolean = false,
     val autoStopped: Boolean = false
 ) {
     val duration: Duration

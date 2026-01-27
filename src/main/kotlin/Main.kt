@@ -1,7 +1,6 @@
 package com.timekeeper
 
 import java.awt.*
-import java.awt.image.BufferedImage
 import java.time.LocalDateTime
 import javax.swing.SwingUtilities
 import javax.swing.Timer
@@ -16,7 +15,7 @@ sealed class TimerState {
         override val elapsed = Duration.ZERO
     }
 
-    data class Running(val startTime: LocalDateTime, override var elapsed: Duration = Duration.ZERO) : TimerState()
+    data class Started(val startTime: LocalDateTime, override var elapsed: Duration = Duration.ZERO) : TimerState()
 }
 
 fun main() {
@@ -30,13 +29,10 @@ class TimeKeeperApp {
     companion object {
         private val IDLE_TIMEOUT = 30.seconds
         private val TIMER_INTERVAL = 1.seconds
-        private const val ICON_SIZE = 22
     }
 
     private val timeTracker = TimeTracker()
     private val overviewWindow = OverviewWindow(timeTracker)
-    private val stoppedIcon = createStoppedIcon()
-    private val runningIcon = createRunningIcon()
     private val trayIcon: TrayIcon
     private val timer: Timer
     private var state: TimerState = TimerState.Stopped
@@ -51,7 +47,7 @@ class TimeKeeperApp {
         val startStopItem = MenuItem("Start").apply {
             addActionListener {
                 when (state) {
-                    is TimerState.Running -> {
+                    is TimerState.Started -> {
                         stopTimer(autoStopped = false)
                         label = "Start"
                     }
@@ -78,7 +74,7 @@ class TimeKeeperApp {
             })
         }
 
-        trayIcon = TrayIcon(stoppedIcon, Duration.ZERO.format(), popup).apply {
+        trayIcon = TrayIcon(TrayIcons.stopped, Duration.ZERO.format(), popup).apply {
             isImageAutoSize = true
         }
 
@@ -94,7 +90,7 @@ class TimeKeeperApp {
             val timeDiff = currentTime - lastCheckTime
 
             when (val s = state) {
-                is TimerState.Running -> {
+                is TimerState.Started -> {
                     if (timeDiff > IDLE_TIMEOUT.inWholeMilliseconds) {
                         stopTimer(autoStopped = true, endTime = LocalDateTime.now().minusSeconds(timeDiff / 1000))
                         startStopItem.label = "Start"
@@ -111,40 +107,9 @@ class TimeKeeperApp {
         }
     }
 
-    private fun createStoppedIcon() = createIcon(ICON_SIZE) { g, size ->
-        val triangleSize = 10
-        val startX = (size - triangleSize) / 2 + 2
-        val startY = (size - triangleSize) / 2
-        g.fillPolygon(
-            intArrayOf(startX, startX + triangleSize, startX),
-            intArrayOf(startY, size / 2, startY + triangleSize),
-            3
-        )
-    }
-
-    private fun createRunningIcon() = createIcon(ICON_SIZE) { g, size ->
-        val barWidth = 3
-        val barHeight = 12
-        val spacing = 3
-        val startX = (size - barWidth * 2 - spacing) / 2
-        val startY = (size - barHeight) / 2
-        g.fillRect(startX, startY, barWidth, barHeight)
-        g.fillRect(startX + barWidth + spacing, startY, barWidth, barHeight)
-    }
-
-    private fun createIcon(size: Int, draw: (Graphics2D, Int) -> Unit) =
-        BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB).also { image ->
-            image.createGraphics().apply {
-                setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-                color = Color.WHITE
-                draw(this, size)
-                dispose()
-            }
-        }
-
     private fun startTimer() {
-        state = TimerState.Running(LocalDateTime.now())
-        trayIcon.image = runningIcon
+        state = TimerState.Started(LocalDateTime.now())
+        trayIcon.image = TrayIcons.started
         timer.start()
         updateDisplay()
         overviewWindow.update(state)
@@ -152,7 +117,7 @@ class TimeKeeperApp {
 
     private fun stopTimer(autoStopped: Boolean = false, endTime: LocalDateTime? = null) {
         when (val s = state) {
-            is TimerState.Running -> {
+            is TimerState.Started -> {
                 timeTracker.addSession(
                     TimeSession(
                         s.startTime,
@@ -161,7 +126,7 @@ class TimeKeeperApp {
                     )
                 )
                 state = TimerState.Stopped
-                trayIcon.image = stoppedIcon
+                trayIcon.image = TrayIcons.stopped
                 timer.stop()
                 updateDisplay()
                 overviewWindow.update(state)

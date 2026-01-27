@@ -31,7 +31,7 @@ class SessionFormatter(private val timeTracker: TimeTracker) {
         renderSessions: StringBuilder.(List<TimeSession>) -> Unit
     ) = buildString {
         val allSessions = when (state) {
-            is TimerState.Running -> sessions + TimeSession(state.startTime, LocalDateTime.now(), running = true)
+            is TimerState.Started -> sessions + TimeSession(state.startTime, LocalDateTime.now(), inProgress = true)
             is TimerState.Stopped -> sessions
         }
         append("$title\n")
@@ -47,9 +47,9 @@ class SessionFormatter(private val timeTracker: TimeTracker) {
 }
 
 private fun TimeSession.format(): String {
-    val endStr = if (running) "...  " else endTime.formatTime()
+    val endStr = if (inProgress) "...  " else endTime.formatTime()
     val suffix = when {
-        running -> " [running]"
+        inProgress -> " [in progress]"
         autoStopped -> " [auto-stopped]"
         else -> ""
     }
