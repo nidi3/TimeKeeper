@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage
 import java.time.LocalDateTime
 import javax.swing.*
 import kotlin.system.exitProcess
+import kotlin.time.Duration.Companion.seconds
 
 fun main() {
     System.setProperty("apple.awt.UIElement", "true")
@@ -17,8 +18,8 @@ fun main() {
 
 class TimeKeeperApp {
     companion object {
-        private const val IDLE_TIMEOUT_MS = 30000L
-        private const val TIMER_INTERVAL_MS = 1000
+        private val IDLE_TIMEOUT = 30.seconds
+        private val TIMER_INTERVAL = 1.seconds
         private const val ICON_SIZE = 22
     }
 
@@ -79,14 +80,14 @@ class TimeKeeperApp {
             exitProcess(1)
         }
 
-        timer = Timer(TIMER_INTERVAL_MS, object : ActionListener {
+        timer = Timer(TIMER_INTERVAL.inWholeMilliseconds.toInt(), object : ActionListener {
             private var lastCheckTime = System.currentTimeMillis()
 
             override fun actionPerformed(e: ActionEvent) {
                 val currentTime = System.currentTimeMillis()
                 val timeDiff = currentTime - lastCheckTime
 
-                if (timeDiff > IDLE_TIMEOUT_MS && isRunning) {
+                if (timeDiff > IDLE_TIMEOUT.inWholeMilliseconds && isRunning) {
                     stopTimer(autoStopped = true, endTime = LocalDateTime.now().minusSeconds(timeDiff / 1000))
                     val menuItem = (popup.getItem(0) as MenuItem)
                     menuItem.label = "Start"
