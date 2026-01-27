@@ -162,5 +162,5 @@ class TimeKeeperApp {
         trayIcon.toolTip = state.elapsed.format()
     }
 
-    private fun showOverview() = OverviewWindow.show(timeTracker)
+    private fun showOverview() = OverviewWindow.show(timeTracker, state)
 }
