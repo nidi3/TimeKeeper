@@ -16,7 +16,7 @@ No tests or linting are currently configured.
 Prefer Kotlin standard library functions over Java equivalents:
 - `exitProcess()` instead of `System.exit()`
 - `kotlin.time.Duration` (e.g., `30.seconds`) instead of `java.time.Duration`
-- `println()` instead of `System.out.println()`
+- `showError()` for error dialogs
 - `require()` / `check()` for preconditions
 - `use {}` for resources
 - `buildString {}` instead of `StringBuilder`
@@ -39,6 +39,8 @@ TimeKeeper is a Kotlin/Swing desktop application that runs as a system tray time
 - **TimeTracker.kt** - Session persistence layer. Contains `TimeSession` data class and `TimeTracker` class that stores sessions to `~/.timekeeper_data.txt` in pipe-delimited format (`startTime|endTime|autoStopped`).
 
 - **OverviewWindow.kt** - Statistics display window with tabbed views for daily and weekly session summaries.
+
+- **Extensions.kt** - Kotlin extension functions (e.g., `Duration.format()`).
 
 ### Data Flow
 

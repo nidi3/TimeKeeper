@@ -1,5 +1,6 @@
 package com.timekeeper
 
+import javax.swing.JOptionPane
 import kotlin.time.Duration
 
 fun Duration.format(): String {
@@ -8,3 +9,6 @@ fun Duration.format(): String {
         "${hours.pad()}:${minutes.pad()}:${seconds.pad()}"
     }
 }
+
+fun showError(message: String) =
+    JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE)

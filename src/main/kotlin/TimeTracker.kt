@@ -48,7 +48,7 @@ class TimeTracker {
                     writer.println("${session.startTime}|${session.endTime}|${session.autoStopped}")
                 }
             }
-        }
+        }.onFailure { showError("Failed to save sessions: ${it.message}") }
     }
 
     private fun loadSessions() {
@@ -68,6 +68,6 @@ class TimeTracker {
                     }
                 }
             }
-        }
+        }.onFailure { showError("Failed to load sessions: ${it.message}") }
     }
 }

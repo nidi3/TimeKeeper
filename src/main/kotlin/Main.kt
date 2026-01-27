@@ -22,26 +22,21 @@ class TimeKeeperApp {
         private const val ICON_SIZE = 22
     }
 
+    private val timeTracker = TimeTracker()
+    private val stoppedIcon = createStoppedIcon()
+    private val runningIcon = createRunningIcon()
     private val trayIcon: TrayIcon
     private val timer: Timer
-    private val timeTracker: TimeTracker
     private var startTime: LocalDateTime? = null
-    private var elapsed: Duration = Duration.ZERO
+    private var elapsed = Duration.ZERO
     private var isRunning = false
     private var lastCheckTime = System.currentTimeMillis()
-    private val stoppedIcon: Image
-    private val runningIcon: Image
 
     init {
         if (!SystemTray.isSupported()) {
             JOptionPane.showMessageDialog(null, "System tray is not supported", "Error", JOptionPane.ERROR_MESSAGE)
             exitProcess(1)
         }
-
-        timeTracker = TimeTracker()
-
-        stoppedIcon = createStoppedIcon()
-        runningIcon = createRunningIcon()
 
         val startStopItem = MenuItem("Start").apply {
             addActionListener {
@@ -86,8 +81,7 @@ class TimeKeeperApp {
 
             if (timeDiff > IDLE_TIMEOUT.inWholeMilliseconds && isRunning) {
                 stopTimer(autoStopped = true, endTime = LocalDateTime.now().minusSeconds(timeDiff / 1000))
-                val menuItem = (popup.getItem(0) as MenuItem)
-                menuItem.label = "Start"
+                startStopItem.label = "Start"
             }
 
             if (isRunning) {
