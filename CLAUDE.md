@@ -46,6 +46,8 @@ TimeKeeper is a Kotlin/Swing desktop application that runs as a system tray time
 
 - **SessionFormatter.kt** - Generates formatted text for session displays. Separates text handling from UI.
 
+- **TrayIcons.kt** - System tray icons (`TrayIcons.stopped`, `TrayIcons.started`).
+
 - **Extensions.kt** - Kotlin extension functions for formatting (`Duration.format()`, `LocalDateTime.formatTime()`, `LocalDate.formatDate()`).
 
 ### Data Flow
