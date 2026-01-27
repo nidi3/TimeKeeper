@@ -8,6 +8,16 @@ import kotlin.system.exitProcess
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+sealed class TimerState {
+    abstract val elapsed: Duration
+
+    data object Stopped : TimerState() {
+        override val elapsed = Duration.ZERO
+    }
+
+    data class Running(val startTime: LocalDateTime, override var elapsed: Duration = Duration.ZERO) : TimerState()
+}
+
 fun main() {
     System.setProperty("apple.awt.UIElement", "true")
     SwingUtilities.invokeLater {
@@ -27,9 +37,7 @@ class TimeKeeperApp {
     private val runningIcon = createRunningIcon()
     private val trayIcon: TrayIcon
     private val timer: Timer
-    private var startTime: LocalDateTime? = null
-    private var elapsed = Duration.ZERO
-    private var isRunning = false
+    private var state: TimerState = TimerState.Stopped
     private var lastCheckTime = System.currentTimeMillis()
 
     init {
@@ -40,12 +48,15 @@ class TimeKeeperApp {
 
         val startStopItem = MenuItem("Start").apply {
             addActionListener {
-                if (isRunning) {
-                    stopTimer(autoStopped = false)
-                    label = "Start"
-                } else {
-                    startTimer()
-                    label = "Stop"
+                when (state) {
+                    is TimerState.Running -> {
+                        stopTimer(autoStopped = false)
+                        label = "Start"
+                    }
+                    is TimerState.Stopped -> {
+                        startTimer()
+                        label = "Stop"
+                    }
                 }
             }
         }
@@ -79,14 +90,17 @@ class TimeKeeperApp {
             val currentTime = System.currentTimeMillis()
             val timeDiff = currentTime - lastCheckTime
 
-            if (timeDiff > IDLE_TIMEOUT.inWholeMilliseconds && isRunning) {
-                stopTimer(autoStopped = true, endTime = LocalDateTime.now().minusSeconds(timeDiff / 1000))
-                startStopItem.label = "Start"
-            }
-
-            if (isRunning) {
-                elapsed += 1.seconds
-                updateDisplay()
+            when (val s = state) {
+                is TimerState.Running -> {
+                    if (timeDiff > IDLE_TIMEOUT.inWholeMilliseconds) {
+                        stopTimer(autoStopped = true, endTime = LocalDateTime.now().minusSeconds(timeDiff / 1000))
+                        startStopItem.label = "Start"
+                    } else {
+                        s.elapsed += 1.seconds
+                        updateDisplay()
+                    }
+                }
+                is TimerState.Stopped -> {}
             }
 
             lastCheckTime = currentTime
@@ -125,28 +139,28 @@ class TimeKeeperApp {
         }
 
     private fun startTimer() {
-        startTime = LocalDateTime.now()
-        elapsed = Duration.ZERO
-        isRunning = true
+        state = TimerState.Running(LocalDateTime.now())
         trayIcon.image = runningIcon
         timer.start()
         updateDisplay()
     }
 
     private fun stopTimer(autoStopped: Boolean = false, endTime: LocalDateTime? = null) {
-        if (isRunning && startTime != null) {
-            timeTracker.addSession(TimeSession(startTime!!, endTime ?: LocalDateTime.now(), autoStopped))
-            isRunning = false
-            trayIcon.image = stoppedIcon
-            timer.stop()
-            elapsed = Duration.ZERO
-            updateDisplay()
+        when (val s = state) {
+            is TimerState.Running -> {
+                timeTracker.addSession(TimeSession(s.startTime, endTime ?: LocalDateTime.now(), autoStopped))
+                state = TimerState.Stopped
+                trayIcon.image = stoppedIcon
+                timer.stop()
+                updateDisplay()
+            }
+            is TimerState.Stopped -> {}
         }
     }
 
     private fun updateDisplay() {
-        trayIcon.toolTip = elapsed.format()
+        trayIcon.toolTip = state.elapsed.format()
     }
 
-    private fun showOverview() = OverviewWindow(timeTracker)
+    private fun showOverview() = OverviewWindow.show(timeTracker)
 }

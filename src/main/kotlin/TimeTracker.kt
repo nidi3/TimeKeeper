@@ -16,8 +16,11 @@ data class TimeSession(
 }
 
 class TimeTracker {
+    companion object {
+        private val DATA_FILE = File(System.getProperty("user.home"), ".timekeeper_data.txt")
+    }
+
     private val sessions = mutableListOf<TimeSession>()
-    private val dataFile = File(System.getProperty("user.home"), ".timekeeper_data.txt")
 
     init {
         loadSessions()
@@ -43,7 +46,7 @@ class TimeTracker {
 
     private fun saveSessions() {
         runCatching {
-            PrintWriter(FileWriter(dataFile)).use { writer ->
+            PrintWriter(FileWriter(DATA_FILE)).use { writer ->
                 sessions.forEach { session ->
                     writer.println("${session.startTime}|${session.endTime}|${session.autoStopped}")
                 }
@@ -52,10 +55,10 @@ class TimeTracker {
     }
 
     private fun loadSessions() {
-        if (!dataFile.exists()) return
+        if (!DATA_FILE.exists()) return
 
         runCatching {
-            BufferedReader(FileReader(dataFile)).use { reader ->
+            BufferedReader(FileReader(DATA_FILE)).use { reader ->
                 reader.lineSequence().forEach { line ->
                     val parts = line.split("|")
                     if (parts.size >= 2) {

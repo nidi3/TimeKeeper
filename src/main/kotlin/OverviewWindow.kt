@@ -4,21 +4,30 @@ import javax.swing.*
 import java.awt.*
 import java.time.format.DateTimeFormatter
 
-class OverviewWindow(private val timeTracker: TimeTracker) {
-    private val frame: JFrame
+class OverviewWindow private constructor(private val timeTracker: TimeTracker) {
+    private val frame = JFrame("Time Keeper Overview").apply {
+        defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
+        setSize(600, 400)
+        setLocationRelativeTo(null)
+    }
 
-    init {
-        frame = JFrame("Time Keeper Overview").apply {
-            defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
-            setSize(600, 400)
-            setLocationRelativeTo(null)
-            contentPane = JPanel(BorderLayout()).apply {
-                add(JTabbedPane().apply {
-                    addTab("Daily", createDailyPanel())
-                    addTab("Weekly", createWeeklyPanel())
-                }, BorderLayout.CENTER)
-            }
-            isVisible = true
+    companion object {
+        private var instance: OverviewWindow? = null
+
+        fun show(timeTracker: TimeTracker) {
+            val window = instance ?: OverviewWindow(timeTracker).also { instance = it }
+            window.refresh()
+            window.frame.isVisible = true
+            window.frame.toFront()
+        }
+    }
+
+    private fun refresh() {
+        frame.contentPane = JPanel(BorderLayout()).apply {
+            add(JTabbedPane().apply {
+                addTab("Daily", createDailyPanel())
+                addTab("Weekly", createWeeklyPanel())
+            }, BorderLayout.CENTER)
         }
     }
 
