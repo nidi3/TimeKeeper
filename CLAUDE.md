@@ -14,7 +14,13 @@ No tests or linting are currently configured.
 ## Code Style
 
 Prefer Kotlin standard library functions over Java equivalents:
-- Use `exitProcess()` instead of `System.exit()`
+- `exitProcess()` instead of `System.exit()`
+- `kotlin.time.Duration` (e.g., `30.seconds`) instead of `java.time.Duration`
+- `println()` instead of `System.out.println()`
+- `require()` / `check()` for preconditions
+- `use {}` for resources
+- `buildString {}` instead of `StringBuilder`
+- `runCatching {}` instead of try-catch
 
 ## Architecture
 
