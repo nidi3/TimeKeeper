@@ -53,13 +53,13 @@ class OverviewWindow private constructor(private val timeTracker: TimeTracker) {
         generateSequence(today.with(DayOfWeek.MONDAY)) { it.plusDays(1) }
             .takeWhile { it <= today }
             .forEach { appendDay(it, sessionsByDate[it] ?: emptyList()).also { append("\n") } }
-        append("Week total: ${timeTracker.getTotalDuration(sessions).format()}\n")
+        append("${"Week".padStart(15)} (${timeTracker.getTotalDuration(sessions).format()})\n")
     }
 
     private fun StringBuilder.appendDay(date: LocalDate, sessions: List<TimeSession>) {
         append(date.formatDate()).append("\n")
         sessions.forEach { append("  ").append(it.format()) }
-        append("  Day total: ${timeTracker.getTotalDuration(sessions).format()}\n")
+        append("  ${"Day".padStart(13)} (${timeTracker.getTotalDuration(sessions).format()})\n")
     }
 
     private fun createPanel(
