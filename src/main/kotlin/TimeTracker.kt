@@ -1,10 +1,9 @@
 package com.timekeeper
 
-import java.io.*
+import java.nio.file.Path
 import java.time.*
+import kotlin.io.path.*
 import kotlin.time.Duration
-import kotlin.time.toKotlinDuration
-import java.time.Duration as JavaDuration
 
 data class TimeSession(
     val start: LocalDateTime,
@@ -13,22 +12,26 @@ data class TimeSession(
     val autoStopped: Boolean = false
 ) {
     val duration: Duration
-        get() = JavaDuration.between(start, end).toKotlinDuration()
+        get() = start.until(end)
 }
 
-class TimeTracker {
-    companion object {
-        private val DATA_FILE = File(System.getProperty("user.home"), ".timekeeper_data.txt")
-    }
-
+class TimeTracker(
+    private val dataFile: Path = Path(System.getProperty("user.home"), ".timekeeper_data.txt")
+) {
     private val sessions = mutableListOf<TimeSession>()
 
     init {
         loadSessions()
     }
 
-    fun addSession(session: TimeSession) {
-        sessions.add(session)
+    fun addSession(startTime: LocalDateTime, endTime: LocalDateTime?) {
+        sessions.add(
+            TimeSession(
+                startTime,
+                endTime ?: LocalDateTime.now(),
+                autoStopped = endTime != null
+            )
+        )
         saveSessions()
     }
 
@@ -47,28 +50,22 @@ class TimeTracker {
 
     private fun saveSessions() {
         runCatching {
-            PrintWriter(FileWriter(DATA_FILE)).use { writer ->
-                sessions.forEach { session ->
-                    writer.println("${session.start}|${session.end}|${session.autoStopped}")
-                }
-            }
+            dataFile.writeLines(sessions.map { "${it.start}|${it.end}|${it.autoStopped}" })
         }.onFailure { showError("Failed to save sessions: ${it.message}") }
     }
 
     private fun loadSessions() {
-        if (!DATA_FILE.exists()) return
+        if (!dataFile.exists()) return
 
         runCatching {
-            BufferedReader(FileReader(DATA_FILE)).use { reader ->
-                reader.lineSequence().forEach { line ->
-                    val parts = line.split("|")
-                    if (parts.size >= 2) {
-                        runCatching {
-                            val start = LocalDateTime.parse(parts[0])
-                            val end = LocalDateTime.parse(parts[1])
-                            val autoStopped = if (parts.size >= 3) parts[2].toBoolean() else false
-                            sessions.add(TimeSession(start, end, autoStopped = autoStopped))
-                        }
+            dataFile.forEachLine { line ->
+                val parts = line.split("|")
+                if (parts.size >= 2) {
+                    runCatching {
+                        val start = LocalDateTime.parse(parts[0])
+                        val end = LocalDateTime.parse(parts[1])
+                        val autoStopped = if (parts.size >= 3) parts[2].toBoolean() else false
+                        sessions.add(TimeSession(start, end, autoStopped = autoStopped))
                     }
                 }
             }

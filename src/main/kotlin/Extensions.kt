@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.swing.JOptionPane
-import kotlin.time.Duration
+import kotlin.time.*
 
 private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd (EEE)")
@@ -20,3 +20,7 @@ fun LocalDate.formatDate(): String = format(dateFormatter)
 
 fun showError(message: String) =
     JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE)
+
+fun Duration.ago() = LocalDateTime.now().minus(toJavaDuration())
+fun LocalDateTime.untilNow() = until(LocalDateTime.now())
+fun LocalDateTime.until(time: LocalDateTime) = java.time.Duration.between(this, time).toKotlinDuration()
