@@ -7,10 +7,10 @@ import javax.swing.*
 class AboutWindow {
     private val appIcon = ImageIcon(javaClass.getResource("/TimeKeeper.iconset/icon_128x128.png"))
 
-    private val version by lazy {
+    private val properties by lazy {
         javaClass.getResourceAsStream("/version.properties")?.use { stream ->
-            Properties().apply { load(stream) }.getProperty("version")
-        } ?: "unknown"
+            Properties().apply { load(stream) }
+        } ?: Properties()
     }
 
     private val frame = JFrame("About").apply {
@@ -18,7 +18,10 @@ class AboutWindow {
         contentPane = JPanel(BorderLayout(10, 10)).apply {
             border = BorderFactory.createEmptyBorder(20, 20, 20, 20)
             add(JLabel(appIcon), BorderLayout.WEST)
-            add(JLabel("TimeKeeper $version"), BorderLayout.CENTER)
+            add(Box.createVerticalBox().apply {
+                add(JLabel("TimeKeeper ${properties.resolve("version")}"))
+                add(JLabel(properties.resolve("commitTime")))
+            }, BorderLayout.CENTER)
         }
         pack()
         setLocationRelativeTo(null)
@@ -32,3 +35,6 @@ class AboutWindow {
         }
     }
 }
+
+private fun Properties.resolve(key: String) =
+    getProperty(key)?.takeUnless { it.startsWith("\${") } ?: "unknown"
