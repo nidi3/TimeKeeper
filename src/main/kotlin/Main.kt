@@ -26,8 +26,8 @@ class TimeKeeperApp {
     }
 
     private var state: TimerState = TimerState.Stopped
-    private val idleDetector = IdleDetector(IDLE_TIMEOUT)
 
+    private val idleDetector = IdleDetector(IDLE_TIMEOUT)
     private val timeTracker = TimeTracker()
     private val overviewWindow = OverviewWindow(timeTracker)
     private val startStopItem = createStartStopItem()
@@ -72,6 +72,7 @@ class TimeKeeperApp {
     }
 
     private fun exit() {
+        stopTimer()
         SystemTray.getSystemTray().remove(trayIcon)
         exitProcess(0)
     }
