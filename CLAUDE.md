@@ -12,7 +12,7 @@ Maven project. Build and run through IntelliJ IDEA or command line:
 
 ## Git Commits
 
-Write commit message to `.git/COMMIT_MSG`, then use `git commit -F .git/COMMIT_MSG`. This avoids permission prompts for each unique commit message.
+Write commit message to scratchpad, then use `git commit -F <scratchpad>/COMMIT_MSG`. This avoids permission prompts.
 
 ## Code Style
 
