@@ -1,9 +1,7 @@
 package com.timekeeper
 
 import java.time.LocalDateTime
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.*
 import kotlin.time.Duration.Companion.seconds
 
 class IdleDetectorTest {

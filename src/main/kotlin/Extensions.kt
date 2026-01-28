@@ -4,7 +4,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.swing.JOptionPane
-import kotlin.time.*
+import kotlin.time.Duration
+import kotlin.time.toKotlinDuration
 
 private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd (EEE)")

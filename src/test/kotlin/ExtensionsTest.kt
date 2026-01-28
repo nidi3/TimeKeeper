@@ -2,9 +2,7 @@ package com.timekeeper
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.*
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds

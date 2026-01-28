@@ -1,15 +1,11 @@
 package com.timekeeper
 
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
+import java.time.*
 import kotlin.io.path.writeText
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.LocalDateTime
-import org.junit.jupiter.api.BeforeEach
-import kotlin.test.Test
-import kotlin.test.assertContains
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class SessionFormatterTest {
 
