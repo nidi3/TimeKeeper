@@ -1,4 +1,4 @@
-package com.timekeeper
+package guru.nidi.timekeeper
 
 import java.time.LocalDate
 import java.time.LocalDateTime

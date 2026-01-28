@@ -1,4 +1,4 @@
-package com.timekeeper
+package guru.nidi.timekeeper
 
 import java.awt.BorderLayout
 import java.awt.Font
@@ -10,14 +10,14 @@ class OverviewWindow(timeTracker: TimeTracker) {
     private val weeklyText = createTextArea()
     private val frame = JFrame("Time Keeper Overview").apply {
         defaultCloseOperation = JFrame.HIDE_ON_CLOSE
-        setSize(600, 400)
-        setLocationRelativeTo(null)
         contentPane = JPanel(BorderLayout()).apply {
             add(JTabbedPane().apply {
                 addTab("Daily", JScrollPane(dailyText))
                 addTab("Weekly", JScrollPane(weeklyText))
             }, BorderLayout.CENTER)
         }
+        setSize(600, 400)
+        setLocationRelativeTo(null)
     }
 
     fun show(state: TimerState) {

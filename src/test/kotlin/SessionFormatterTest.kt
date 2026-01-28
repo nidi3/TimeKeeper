@@ -1,4 +1,4 @@
-package com.timekeeper
+package guru.nidi.timekeeper
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.io.TempDir

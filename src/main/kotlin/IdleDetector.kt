@@ -1,4 +1,4 @@
-package com.timekeeper
+package guru.nidi.timekeeper
 
 import java.time.LocalDateTime
 import kotlin.time.Duration

@@ -20,7 +20,7 @@ Prefer newer APIs and Kotlin standard library functions over Java equivalents:
 - `java.nio.file.Path` with `kotlin.io.path.*` instead of `java.io.File`
 - `exitProcess()` instead of `System.exit()`
 - `kotlin.time.Duration` (e.g., `30.seconds`) instead of `java.time.Duration`
-- `showError()` for error dialogs
+- `Dialogs.showError()` for error dialogs
 - `require()` / `check()` for preconditions
 - `use {}` for resources
 - `buildString {}` instead of `StringBuilder`
@@ -38,7 +38,7 @@ Prefer newer APIs and Kotlin standard library functions over Java equivalents:
 
 TimeKeeper is a Kotlin/Swing desktop application that runs as a system tray timer for tracking work sessions.
 
-**Package**: `com.timekeeper`
+**Package**: `guru.nidi.timekeeper`
 
 ### Components
 

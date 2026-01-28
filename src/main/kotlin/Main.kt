@@ -1,4 +1,4 @@
-package com.timekeeper
+package guru.nidi.timekeeper
 
 import java.awt.*
 import java.time.LocalDateTime
@@ -30,19 +30,20 @@ class TimeKeeperApp {
     private val idleDetector = IdleDetector(IDLE_TIMEOUT)
     private val timeTracker = TimeTracker()
     private val overviewWindow = OverviewWindow(timeTracker)
+    private val aboutWindow = AboutWindow()
     private val startStopItem = createStartStopItem()
     private val trayIcon = createTrayIcon()
     private val timer = createTimer()
 
     init {
         if (!SystemTray.isSupported()) {
-            showError("System tray is not supported")
+            Dialogs.showError("System tray is not supported")
             exitProcess(1)
         }
         runCatching {
             SystemTray.getSystemTray().add(trayIcon)
         }.onFailure {
-            showError("Failed to add tray icon")
+            Dialogs.showError("Failed to add tray icon")
             exitProcess(1)
         }
     }
@@ -66,6 +67,9 @@ class TimeKeeperApp {
             addActionListener { overviewWindow.show(state) }
         })
         addSeparator()
+        add(MenuItem("About").apply {
+            addActionListener { aboutWindow.show() }
+        })
         add(MenuItem("Exit").apply {
             addActionListener { exit() }
         })

@@ -1,4 +1,4 @@
-package com.timekeeper
+package guru.nidi.timekeeper
 
 import java.nio.file.Path
 import java.time.*
@@ -51,7 +51,7 @@ class TimeTracker(
     private fun saveSessions() {
         runCatching {
             dataFile.writeLines(sessions.map { "${it.start}|${it.end}|${it.autoStopped}" })
-        }.onFailure { showError("Failed to save sessions: ${it.message}") }
+        }.onFailure { Dialogs.showError("Failed to save sessions: ${it.message}") }
     }
 
     private fun loadSessions() {
@@ -69,6 +69,6 @@ class TimeTracker(
                     }
                 }
             }
-        }.onFailure { showError("Failed to load sessions: ${it.message}") }
+        }.onFailure { Dialogs.showError("Failed to load sessions: ${it.message}") }
     }
 }

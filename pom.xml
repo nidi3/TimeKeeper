@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.timekeeper</groupId>
+    <groupId>guru.nidi.timekeeper</groupId>
     <artifactId>timekeeper</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -43,6 +43,13 @@
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
 
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -79,7 +86,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.timekeeper.MainKt</mainClass>
+                            <mainClass>guru.nidi.timekeeper.MainKt</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -98,7 +105,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.timekeeper.MainKt</mainClass>
+                                    <mainClass>guru.nidi.timekeeper.MainKt</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -114,13 +121,13 @@
                     <name>TimeKeeper</name>
                     <appVersion>1.0.0</appVersion>
                     <vendor>Nidi Guru</vendor>
-                    <mainClass>com.timekeeper.MainKt</mainClass>
+                    <mainClass>guru.nidi.timekeeper.MainKt</mainClass>
                     <mainJar>timekeeper-1.0-SNAPSHOT.jar</mainJar>
                     <input>${project.build.directory}</input>
                     <destination>${project.build.directory}/dist</destination>
                     <type>DMG</type>
                     <icon>${project.basedir}/src/main/resources/TimeKeeper.icns</icon>
-                    <macPackageIdentifier>com.timekeeper</macPackageIdentifier>
+                    <macPackageIdentifier>guru.nidi.timekeeper</macPackageIdentifier>
                     <macPackageName>TimeKeeper</macPackageName>
                 </configuration>
             </plugin>

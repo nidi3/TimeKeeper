@@ -1,9 +1,8 @@
-package com.timekeeper
+package guru.nidi.timekeeper
 
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import javax.swing.JOptionPane
 import kotlin.time.Duration
 import kotlin.time.toKotlinDuration
 
@@ -18,9 +17,6 @@ fun Duration.format(): String {
 
 fun LocalDateTime.formatTime(): String = format(timeFormatter)
 fun LocalDate.formatDate(): String = format(dateFormatter)
-
-fun showError(message: String) =
-    JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE)
 
 fun LocalDateTime.untilNow() = until(LocalDateTime.now())
 fun LocalDateTime.until(time: LocalDateTime) = java.time.Duration.between(this, time).toKotlinDuration()
