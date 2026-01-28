@@ -4,16 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build & Run
 
-This is an IntelliJ IDEA project without Gradle/Maven. Build and run through the IDE:
-- Open in IntelliJ IDEA
-- Build: Build → Build Project (or Cmd+F9)
+Maven project. Build and run through IntelliJ IDEA or command line:
+- Build: `mvn compile` or Cmd+F9 in IDE
 - Run: Run `main()` in `Main.kt`
-
-No tests or linting are currently configured.
+- Test: `mvn test`
 
 ## Code Style
 
-Prefer Kotlin standard library functions over Java equivalents:
+Prefer newer APIs and Kotlin standard library functions over Java equivalents:
+- `java.nio.file.Path` with `kotlin.io.path.*` instead of `java.io.File`
 - `exitProcess()` instead of `System.exit()`
 - `kotlin.time.Duration` (e.g., `30.seconds`) instead of `java.time.Duration`
 - `showError()` for error dialogs
