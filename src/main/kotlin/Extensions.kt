@@ -21,6 +21,5 @@ fun LocalDate.formatDate(): String = format(dateFormatter)
 fun showError(message: String) =
     JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE)
 
-fun Duration.ago() = LocalDateTime.now().minus(toJavaDuration())
 fun LocalDateTime.untilNow() = until(LocalDateTime.now())
 fun LocalDateTime.until(time: LocalDateTime) = java.time.Duration.between(this, time).toKotlinDuration()

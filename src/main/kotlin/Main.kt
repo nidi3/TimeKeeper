@@ -5,8 +5,6 @@ import java.time.LocalDateTime
 import javax.swing.SwingUtilities
 import javax.swing.Timer
 import kotlin.system.exitProcess
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 sealed class TimerState {
@@ -28,7 +26,7 @@ class TimeKeeperApp {
     }
 
     private var state: TimerState = TimerState.Stopped
-    private var lastCheckTime = System.currentTimeMillis()
+    private val idleDetector = IdleDetector(IDLE_TIMEOUT)
 
     private val timeTracker = TimeTracker()
     private val overviewWindow = OverviewWindow(timeTracker)
@@ -79,11 +77,11 @@ class TimeKeeperApp {
     }
 
     private fun createTimer() = Timer(TIMER_INTERVAL.inWholeMilliseconds.toInt()) {
-        val timeDiff = timeSinceLastCall()
-        when (state) {
+        when (val s = state) {
             is TimerState.Started -> {
-                if (timeDiff > IDLE_TIMEOUT) {
-                    stopTimer(timeDiff.ago())
+                val lastActiveTime = idleDetector.lastActiveTime(s.startTime)
+                if (lastActiveTime != null) {
+                    stopTimer(lastActiveTime)
                 } else {
                     trayIcon.toolTip = tooltip()
                 }
@@ -93,15 +91,9 @@ class TimeKeeperApp {
         }
     }
 
-    private fun timeSinceLastCall(): Duration {
-        val currentTime = System.currentTimeMillis()
-        val timeDiff = (currentTime - lastCheckTime).milliseconds
-        lastCheckTime = currentTime
-        return timeDiff
-    }
-
     private fun startTimer() {
         state = TimerState.Started(LocalDateTime.now())
+        idleDetector.reset()
         timer.start()
         trayIcon.image = TrayIcons.started
         trayIcon.toolTip = tooltip()
@@ -129,5 +121,4 @@ class TimeKeeperApp {
         is TimerState.Started -> s.startTime.untilNow().format()
         is TimerState.Stopped -> "Stopped"
     }
-
 }
