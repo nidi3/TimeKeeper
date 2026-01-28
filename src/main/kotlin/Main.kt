@@ -6,16 +6,12 @@ import javax.swing.SwingUtilities
 import javax.swing.Timer
 import kotlin.system.exitProcess
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 sealed class TimerState {
-    abstract val elapsed: Duration
-
-    data object Stopped : TimerState() {
-        override val elapsed = Duration.ZERO
-    }
-
-    data class Started(val startTime: LocalDateTime, override var elapsed: Duration = Duration.ZERO) : TimerState()
+    data object Stopped : TimerState()
+    data class Started(val startTime: LocalDateTime) : TimerState()
 }
 
 fun main() {
@@ -31,104 +27,97 @@ class TimeKeeperApp {
         private val TIMER_INTERVAL = 1.seconds
     }
 
-    private val timeTracker = TimeTracker()
-    private val overviewWindow = OverviewWindow(timeTracker)
-    private val trayIcon: TrayIcon
-    private val timer: Timer
     private var state: TimerState = TimerState.Stopped
     private var lastCheckTime = System.currentTimeMillis()
+
+    private val timeTracker = TimeTracker()
+    private val overviewWindow = OverviewWindow(timeTracker)
+    private val startStopItem = createStartStopItem()
+    private val trayIcon = createTrayIcon()
+    private val timer = createTimer()
 
     init {
         if (!SystemTray.isSupported()) {
             showError("System tray is not supported")
             exitProcess(1)
         }
-
-        val startStopItem = MenuItem("Start").apply {
-            addActionListener {
-                when (state) {
-                    is TimerState.Started -> {
-                        stopTimer(autoStopped = false)
-                        label = "Start"
-                    }
-
-                    is TimerState.Stopped -> {
-                        startTimer()
-                        label = "Stop"
-                    }
-                }
-            }
-        }
-
-        val popup = PopupMenu().apply {
-            add(startStopItem)
-            add(MenuItem("Show Overview").apply {
-                addActionListener { showOverview() }
-            })
-            addSeparator()
-            add(MenuItem("Exit").apply {
-                addActionListener {
-                    SystemTray.getSystemTray().remove(trayIcon)
-                    exitProcess(0)
-                }
-            })
-        }
-
-        trayIcon = TrayIcon(TrayIcons.stopped, Duration.ZERO.format(), popup).apply {
-            isImageAutoSize = true
-        }
-
         runCatching {
             SystemTray.getSystemTray().add(trayIcon)
         }.onFailure {
             showError("Failed to add tray icon")
             exitProcess(1)
         }
+    }
 
-        timer = Timer(TIMER_INTERVAL.inWholeMilliseconds.toInt()) {
-            val currentTime = System.currentTimeMillis()
-            val timeDiff = currentTime - lastCheckTime
+    private fun createStartStopItem() = MenuItem("Start").apply {
+        addActionListener {
+            when (state) {
+                is TimerState.Started -> stopTimer()
+                is TimerState.Stopped -> startTimer()
+            }
+        }
+    }
 
-            when (val s = state) {
-                is TimerState.Started -> {
-                    if (timeDiff > IDLE_TIMEOUT.inWholeMilliseconds) {
-                        stopTimer(autoStopped = true, endTime = LocalDateTime.now().minusSeconds(timeDiff / 1000))
-                        startStopItem.label = "Start"
-                    } else {
-                        s.elapsed += 1.seconds
-                        updateDisplay()
-                    }
+    private fun createTrayIcon() = TrayIcon(TrayIcons.stopped, tooltip(), createPopupMenu()).apply {
+        isImageAutoSize = true
+    }
+
+    private fun createPopupMenu() = PopupMenu().apply {
+        add(startStopItem)
+        add(MenuItem("Show Overview").apply {
+            addActionListener { overviewWindow.show(state) }
+        })
+        addSeparator()
+        add(MenuItem("Exit").apply {
+            addActionListener { exit() }
+        })
+    }
+
+    private fun exit() {
+        SystemTray.getSystemTray().remove(trayIcon)
+        exitProcess(0)
+    }
+
+    private fun createTimer() = Timer(TIMER_INTERVAL.inWholeMilliseconds.toInt()) {
+        val timeDiff = timeSinceLastCall()
+        when (state) {
+            is TimerState.Started -> {
+                if (timeDiff > IDLE_TIMEOUT) {
+                    stopTimer(timeDiff.ago())
+                } else {
+                    trayIcon.toolTip = tooltip()
                 }
-
-                is TimerState.Stopped -> {}
             }
 
-            lastCheckTime = currentTime
+            is TimerState.Stopped -> {}
         }
+    }
+
+    private fun timeSinceLastCall(): Duration {
+        val currentTime = System.currentTimeMillis()
+        val timeDiff = (currentTime - lastCheckTime).milliseconds
+        lastCheckTime = currentTime
+        return timeDiff
     }
 
     private fun startTimer() {
         state = TimerState.Started(LocalDateTime.now())
-        trayIcon.image = TrayIcons.started
         timer.start()
-        updateDisplay()
+        trayIcon.image = TrayIcons.started
+        trayIcon.toolTip = tooltip()
+        startStopItem.label = "Stop"
         overviewWindow.update(state)
     }
 
-    private fun stopTimer(autoStopped: Boolean = false, endTime: LocalDateTime? = null) {
+    private fun stopTimer(endTime: LocalDateTime? = null) {
         when (val s = state) {
             is TimerState.Started -> {
-                timeTracker.addSession(
-                    TimeSession(
-                        s.startTime,
-                        endTime ?: LocalDateTime.now(),
-                        autoStopped = autoStopped
-                    )
-                )
+                timeTracker.addSession(s.startTime, endTime)
                 state = TimerState.Stopped
-                trayIcon.image = TrayIcons.stopped
                 timer.stop()
-                updateDisplay()
+                trayIcon.image = TrayIcons.stopped
+                trayIcon.toolTip = tooltip()
+                startStopItem.label = "Start"
                 overviewWindow.update(state)
             }
 
@@ -136,9 +125,9 @@ class TimeKeeperApp {
         }
     }
 
-    private fun updateDisplay() {
-        trayIcon.toolTip = state.elapsed.format()
+    private fun tooltip() = when (val s = state) {
+        is TimerState.Started -> s.startTime.untilNow().format()
+        is TimerState.Stopped -> "Stopped"
     }
 
-    private fun showOverview() = overviewWindow.show(state)
 }
