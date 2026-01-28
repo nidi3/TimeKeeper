@@ -143,3 +143,4 @@ class TimeTrackerTest {
         assertEquals(0, sessions.size)
     }
 }
+
