@@ -37,7 +37,9 @@ TimeKeeper is a Kotlin/Swing desktop application that runs as a system tray time
 
 ### Components
 
-- **Main.kt** - Entry point, `TimerState` sealed class, and `TimeKeeperApp` class. Manages system tray icon, timer loop, and idle detection (auto-stops after 30s of inactivity).
+- **Main.kt** - Entry point, `TimerState` sealed class, and `TimeKeeperApp` class. Manages system tray icon and timer loop.
+
+- **IdleDetector.kt** - Detects idle/sleep and returns last active time for auto-stop. Uses injectable clock for testability.
 
 - **TimeTracker.kt** - Session persistence layer. Contains `TimeSession` data class and `TimeTracker` class that stores sessions to `~/.timekeeper_data.txt` in pipe-delimited format (`startTime|endTime|autoStopped`).
 
