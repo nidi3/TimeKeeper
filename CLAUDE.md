@@ -8,6 +8,11 @@ Maven project. Build and run through IntelliJ IDEA or command line:
 - Build: `mvn compile` or Cmd+F9 in IDE
 - Run: Run `main()` in `Main.kt`
 - Test: `mvn test`
+- Package: `mvn clean package jpackage:jpackage -DskipTests` → `target/dist/TimeKeeper-*.dmg`
+
+## Git Commits
+
+Write commit message to `.git/COMMIT_MSG`, then use `git commit -F .git/COMMIT_MSG`. This avoids permission prompts for each unique commit message.
 
 ## Code Style
 
